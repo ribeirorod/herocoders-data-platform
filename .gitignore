@@ -45,7 +45,6 @@ home-task/eda/schemas/
 home-task/eda/*.md
 
 # Infra & deployment scripts
-data-platform/infra/
 data-platform/scripts/
 home-task/home-task-description.md
 
