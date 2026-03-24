@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ target.database }}"
+    schema: RAW
+    description: >
+      Raw landing tables populated by the load_raw_source macro pre-hook.
+      Each table holds one VARIANT row per JSON line from the S3 JSONL.gz files,
+      preserving the full envelope: {"metadata": {...}, "payload": {...}}.
+
+    tables:
+      - name: marketplace_licenses_raw
+        description: Raw marketplace license records — envelope + payload as VARIANT.
+        columns:
+          - name: raw_data
+            description: Full JSON envelope including metadata and payload.
+          - name: file_name
+            description: Source S3 file path (METADATA$FILENAME).
+          - name: loaded_at
+            description: Timestamp when the record was loaded into Snowflake.
+
+      - name: marketplace_transactions_raw
+        description: Raw marketplace transaction records.
+        columns:
+          - name: raw_data
+          - name: file_name
+          - name: loaded_at
+
+      - name: amplitude_events_raw
+        description: Raw Amplitude event records.
+        columns:
+          - name: raw_data
+          - name: file_name
+          - name: loaded_at

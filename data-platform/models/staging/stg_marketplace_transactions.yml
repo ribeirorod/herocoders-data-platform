@@ -1,0 +1,144 @@
+version: 2
+
+models:
+  - name: stg_marketplace_transactions
+    description: >
+      Staged marketplace transactions. Deduplicated on transaction_id, types cast,
+      manual_discount dropped, discount nulls coalesced to 0, is_zero_value and
+      is_refund flags derived.
+
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier.
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+
+      - name: addon_license_id
+        description: Foreign key to stg_marketplace_licenses.
+        data_type: integer
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_marketplace_licenses')
+                field: addon_license_id
+
+      - name: license_id
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: app_entitlement_number
+        data_type: varchar
+
+      - name: addon_key
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: addon_name
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: hosting
+        data_type: varchar
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['cloud', 'server', 'datacenter']
+
+      - name: sale_date
+        data_type: date
+        tests:
+          - not_null
+
+      - name: sale_type
+        description: Normalised to uppercase.
+        data_type: varchar
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['NEW', 'RENEWAL', 'UPGRADE', 'REFUND']
+
+      - name: purchase_price
+        data_type: float
+        tests:
+          - not_null
+
+      - name: vendor_amount
+        data_type: float
+        tests:
+          - not_null
+
+      - name: billing_period
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: tier
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: maintenance_start_date
+        data_type: date
+        tests:
+          - not_null
+
+      - name: maintenance_end_date
+        data_type: date
+        tests:
+          - not_null
+
+      - name: sale_channel
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: parent_product_name
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: parent_product_edition
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: loyalty_discount
+        data_type: float
+        tests:
+          - not_null
+
+      - name: marketplace_promotion_discount
+        data_type: float
+        tests:
+          - not_null
+
+      - name: expert_discount
+        data_type: float
+        tests:
+          - not_null
+
+      - name: is_zero_value
+        description: True when purchase_price = 0. Likely bundle deals for existing customers.
+        data_type: boolean
+
+      - name: is_refund
+        description: True when purchase_price < 0.
+        data_type: boolean
+
+      - name: extracted_at
+        data_type: timestamp_ltz
+        tests:
+          - not_null
+
+      - name: loaded_at
+        data_type: timestamp_ltz
+        tests:
+          - not_null

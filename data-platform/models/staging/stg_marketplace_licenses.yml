@@ -1,0 +1,166 @@
+version: 2
+
+models:
+  - name: stg_marketplace_licenses
+    description: >
+      Staged marketplace licenses at license grain (deduplicated on addon_license_id).
+      Multi-campaign attribution rows collapsed — most recent last_updated wins.
+      Status normalized to lowercase (active/Active/ACTIVE → active). Campaign columns excluded (no mart dependency).
+
+    columns:
+      - name: addon_license_id
+        description: Primary key — unique license identifier.
+        data_type: integer
+        tests:
+          - unique
+          - not_null
+
+      - name: license_id
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: app_entitlement_number
+        data_type: varchar
+
+      - name: host_license_id
+        description: >
+          Atlassian customer identifier — present across all hosting types (Cloud, Server, DC).
+          Not unique at license grain: one customer can hold multiple products (addon_keys).
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: host_entitlement_number
+        data_type: varchar
+
+      - name: cloud_id
+        description: Workspace identifier for Cloud licenses. Null for Server/DC.
+        data_type: varchar
+
+      - name: cloud_site_hostname
+        data_type: varchar
+
+      - name: addon_key
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: addon_name
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: hosting
+        data_type: varchar
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['cloud', 'server', 'datacenter']
+
+      - name: last_updated
+        data_type: timestamp_ltz
+        tests:
+          - not_null
+
+      - name: license_type
+        data_type: varchar
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['evaluation', 'commercial', 'academic', 'community']
+
+      - name: maintenance_start_date
+        data_type: date
+        tests:
+          - not_null
+
+      - name: maintenance_end_date
+        data_type: date
+        tests:
+          - not_null
+
+      - name: status
+        description: >
+          Normalised to lowercase. Raw source had 5 variants across 3 logical states:
+          active/Active/ACTIVE/ACTV → active, expired → expired, cancelled → cancelled.
+        data_type: varchar
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['active', 'expired', 'cancelled']
+
+      - name: tier
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: company
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: country
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: region
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: tech_contact_email
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: tech_contact_name
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: evaluation_opportunity_size
+        data_type: varchar
+
+      - name: evaluation_license
+        description: FK to addon_license_id of the originating eval license. Populated on converted commercial records only.
+        data_type: integer
+
+      - name: days_to_convert_eval
+        data_type: float
+
+      - name: evaluation_start_date
+        data_type: date
+
+      - name: evaluation_end_date
+        data_type: date
+
+      - name: evaluation_sale_date
+        data_type: date
+
+
+      - name: is_evaluation
+        description: True when license_type = 'evaluation'.
+        data_type: boolean
+
+      - name: is_active
+        description: True when status = 'active'.
+        data_type: boolean
+
+      - name: is_converted
+        description: True when evaluation_license is not null — this record was converted from a trial.
+        data_type: boolean
+
+      - name: extracted_at
+        data_type: timestamp_ltz
+        tests:
+          - not_null
+
+      - name: loaded_at
+        data_type: timestamp_ltz
+        tests:
+          - not_null

@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# UV
+.python-version
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+!analysis.ipynb
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Raw data (CSV seeds + serialised raw extract — never commit source data)
+home-task/data/
+
+# EDA generated artifacts
+home-task/eda/schemas/
+home-task/eda/*.md
+
+# Infra & deployment scripts
+data-platform/infra/
+data-platform/scripts/
+home-task/home-task-description.md
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+.terraform.lock.hcl
+crash.log
+
+# dbt
+target/
+dbt_packages/
+logs/
+profiles.yml
+!profiles.example.yml
+dbt_packages/
+
+# Docs
+docs/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,54 @@
+name: herocoders_data_platform
+version: 1.0.0
+config-version: 2
+
+profile: herocoders
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths:  ["tests"]
+docs-paths:  ["docs"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+# ---------------------------------------------------------------------------
+# Variables
+# ---------------------------------------------------------------------------
+vars:
+  # Environment-aware database — set per target in profiles.yml
+  raw_database:     "{{ target.database }}"
+
+  # S3 external stage object name — lives in <database>.RAW schema
+  # Full path resolved in load_raw_source macro as: target.database + '.RAW.' + s3_stage
+  s3_stage:         "STG_S3_RAW"
+
+  # Incremental safety net: models won't process events before this date.
+  # Override at runtime: dbt run --vars '{"start_date": "2024-01-01"}'
+  start_date:       "2024-01-01"
+
+# ---------------------------------------------------------------------------
+# Model configuration defaults per layer
+# ---------------------------------------------------------------------------
+models:
+  herocoders_data_platform:
+
+    staging:
+      +schema:       staging
+      +materialized: incremental
+      +tags:         ["staging"]
+
+    intermediate:
+      +schema:       intermediate
+      +materialized: table
+      +tags:         ["intermediate"]
+
+    marts:
+      +schema:       marts
+      +materialized: table
+      +tags:         ["marts"]
+
+seeds:
+  herocoders_data_platform:
+    +schema: reference
+    +tags:   ["seeds"]

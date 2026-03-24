@@ -1,0 +1,103 @@
+version: 2
+
+models:
+  - name: stg_amplitude_events
+    description: >
+      Staged Amplitude product events. Deduplicated on event_id. Bot and test events
+      flagged (not filtered — downstream models apply exclusion). user_property_plan
+      and user_property_tier blank/"None" strings normalised to NULL.
+      user_property_company preserved as-is — company normalisation and cross-source
+      join logic lives in intermediate using lookup dimension tables.
+
+    columns:
+      - name: event_id
+        description: Unique event identifier.
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+
+      - name: event_type
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: event_time
+        data_type: timestamp_ltz
+        tests:
+          - not_null
+
+      - name: user_id
+        description: Null in ~8% of events — anonymous sessions flagged via is_anonymous.
+        data_type: varchar
+
+      - name: device_id
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: platform
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: event_source
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: product
+        data_type: varchar
+        tests:
+          - not_null
+
+      - name: event_properties
+        description: Raw JSON variant. Null in ~32% of events — not all event types capture metadata.
+        data_type: variant
+
+      - name: user_property_company
+        description: >
+          Raw company name from Amplitude user properties. Null in ~10.5% of events.
+          Normalisation (lowercase, strip legal suffixes, append country) applied in intermediate.
+        data_type: varchar
+
+      - name: user_property_plan
+        description: Normalised — blank strings and literal "None" mapped to NULL.
+        data_type: varchar
+
+      - name: user_property_tier
+        description: Normalised — blank strings and literal "None" mapped to NULL.
+        data_type: varchar
+
+      - name: session_id
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: country
+        data_type: varchar
+
+      - name: region
+        data_type: varchar
+
+      - name: is_anonymous
+        description: True when user_id is null.
+        data_type: boolean
+
+      - name: is_bot
+        description: True when device_id = 'bot-automation-001'. Exclude from all product analytics.
+        data_type: boolean
+
+      - name: is_test_event
+        description: True when event_type = 'automated_test_run'. Exclude from all product analytics.
+        data_type: boolean
+
+      - name: extracted_at
+        data_type: timestamp_ltz
+        tests:
+          - not_null
+
+      - name: loaded_at
+        data_type: timestamp_ltz
+        tests:
+          - not_null
