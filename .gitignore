@@ -41,7 +41,6 @@ ENV/
 home-task/data/
 
 # EDA generated artifacts
-home-task/eda/reports/
 home-task/eda/schemas/
 home-task/eda/*.md
 
